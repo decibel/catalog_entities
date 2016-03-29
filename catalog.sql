@@ -39,8 +39,6 @@ CREATE TYPE attribute AS (
 );
 
 
-ALTER TYPE attribute OWNER TO decibel;
-
 --
 -- Name: entity_type; Type: TYPE; Schema: public; Owner: decibel
 --
@@ -51,8 +49,6 @@ CREATE TYPE entity_type AS ENUM (
     'Other Status'
 );
 
-
-ALTER TYPE entity_type OWNER TO decibel;
 
 SET default_tablespace = '';
 
@@ -69,8 +65,6 @@ CREATE TABLE catalog_relations (
     attributes attribute[] NOT NULL
 );
 
-
-ALTER TABLE catalog_relations OWNER TO decibel;
 
 --
 -- Name: changed; Type: VIEW; Schema: public; Owner: decibel
@@ -98,8 +92,6 @@ CREATE VIEW changed AS
   WHERE (a.attributes IS DISTINCT FROM a.previous_attributes);
 
 
-ALTER TABLE changed OWNER TO decibel;
-
 --
 -- Name: current; Type: VIEW; Schema: public; Owner: decibel
 --
@@ -113,8 +105,6 @@ CREATE VIEW current AS
   WHERE (catalog_relations.version = ( SELECT max(catalog_relations_1.version) AS max
            FROM catalog_relations catalog_relations_1));
 
-
-ALTER TABLE current OWNER TO decibel;
 
 --
 -- Name: current_expanded; Type: VIEW; Schema: public; Owner: decibel
@@ -130,8 +120,6 @@ CREATE VIEW current_expanded AS
     LATERAL unnest(c.attributes) WITH ORDINALITY a(attribute_name, attribute_type, ordinality);
 
 
-ALTER TABLE current_expanded OWNER TO decibel;
-
 --
 -- Name: expanded; Type: VIEW; Schema: public; Owner: decibel
 --
@@ -145,8 +133,6 @@ CREATE VIEW expanded AS
    FROM catalog_relations e,
     LATERAL unnest(e.attributes) WITH ORDINALITY a(attribute_name, attribute_type, ordinality);
 
-
-ALTER TABLE expanded OWNER TO decibel;
 
 --
 -- Data for Name: catalog_relations; Type: TABLE DATA; Schema: public; Owner: decibel
