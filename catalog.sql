@@ -1,47 +1,7 @@
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 9.6devel
--- Dumped by pg_dump version 9.6devel
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET client_encoding = 'SQL_ASCII';
-SET standard_conforming_strings = on;
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
-
-SET search_path = public, pg_catalog;
-
---
--- Name: attribute; Type: TYPE; Schema: public; Owner: decibel
---
-
 CREATE TYPE attribute AS (
 	attribute_name text,
 	attribute_type regtype
 );
-
-
---
--- Name: entity_type; Type: TYPE; Schema: public; Owner: decibel
---
 
 CREATE TYPE entity_type AS ENUM (
     'Catalog',
@@ -49,27 +9,19 @@ CREATE TYPE entity_type AS ENUM (
     'Other Status'
 );
 
-
-SET default_tablespace = '';
-
-SET default_with_oids = false;
-
---
--- Name: catalog_relations; Type: TABLE; Schema: public; Owner: decibel
---
-
 CREATE TABLE catalog_relations (
     version numeric NOT NULL,
     entity_name text NOT NULL,
     entity_type entity_type NOT NULL,
     attributes attribute[] NOT NULL
 );
+ALTER TABLE ONLY catalog_relations
+    ADD CONSTRAINT entity_pkey PRIMARY KEY (version, entity_name);
 
 
---
--- Name: changed; Type: VIEW; Schema: public; Owner: decibel
---
-
+/*
+ * VIEWS
+ */
 CREATE VIEW changed AS
  SELECT a.version,
     a.entity_name,
@@ -92,10 +44,6 @@ CREATE VIEW changed AS
   WHERE (a.attributes IS DISTINCT FROM a.previous_attributes);
 
 
---
--- Name: current; Type: VIEW; Schema: public; Owner: decibel
---
-
 CREATE VIEW current AS
  SELECT catalog_relations.version,
     catalog_relations.entity_name,
@@ -105,10 +53,6 @@ CREATE VIEW current AS
   WHERE (catalog_relations.version = ( SELECT max(catalog_relations_1.version) AS max
            FROM catalog_relations catalog_relations_1));
 
-
---
--- Name: current_expanded; Type: VIEW; Schema: public; Owner: decibel
---
 
 CREATE VIEW current_expanded AS
  SELECT c.version,
@@ -120,10 +64,6 @@ CREATE VIEW current_expanded AS
     LATERAL unnest(c.attributes) WITH ORDINALITY a(attribute_name, attribute_type, ordinality);
 
 
---
--- Name: expanded; Type: VIEW; Schema: public; Owner: decibel
---
-
 CREATE VIEW expanded AS
  SELECT e.version,
     e.entity_name,
@@ -134,10 +74,9 @@ CREATE VIEW expanded AS
     LATERAL unnest(e.attributes) WITH ORDINALITY a(attribute_name, attribute_type, ordinality);
 
 
---
--- Data for Name: catalog_relations; Type: TABLE DATA; Schema: public; Owner: decibel
---
-
+/*
+ * DATA
+ */
 COPY catalog_relations (version, entity_name, entity_type, attributes) FROM stdin;
 9.6	pg_aggregate	Catalog	{"(xmin,xid)","(aggfnoid,regproc)","(aggkind,\\"\\"\\"char\\"\\"\\")","(aggnumdirectargs,smallint)","(aggtransfn,regproc)","(aggfinalfn,regproc)","(aggcombinefn,regproc)","(aggmtransfn,regproc)","(aggminvtransfn,regproc)","(aggmfinalfn,regproc)","(aggfinalextra,boolean)","(aggmfinalextra,boolean)","(aggsortop,oid)","(aggtranstype,oid)","(aggtransspace,integer)","(aggmtranstype,oid)","(aggmtransspace,integer)","(agginitval,text)","(aggminitval,text)"}
 9.6	pg_am	Catalog	{"(xmin,xid)","(oid,oid)","(amname,text)","(amhandler,regproc)"}
@@ -686,27 +625,3 @@ COPY catalog_relations (version, entity_name, entity_type, attributes) FROM stdi
 9.5	pg_type	Catalog	{"(xmin,xid)","(oid,oid)","(typname,text)","(typnamespace,oid)","(typowner,oid)","(typlen,smallint)","(typbyval,boolean)","(typtype,\\"\\"\\"char\\"\\"\\")","(typcategory,\\"\\"\\"char\\"\\"\\")","(typispreferred,boolean)","(typisdefined,boolean)","(typdelim,\\"\\"\\"char\\"\\"\\")","(typrelid,oid)","(typelem,oid)","(typarray,oid)","(typinput,regproc)","(typoutput,regproc)","(typreceive,regproc)","(typsend,regproc)","(typmodin,regproc)","(typmodout,regproc)","(typanalyze,regproc)","(typalign,\\"\\"\\"char\\"\\"\\")","(typstorage,\\"\\"\\"char\\"\\"\\")","(typnotnull,boolean)","(typbasetype,oid)","(typtypmod,integer)","(typndims,integer)","(typcollation,oid)","(typdefaultbin,pg_node_tree)","(typdefault,text)","(typacl,aclitem[])"}
 9.5	pg_user_mapping	Catalog	{"(xmin,xid)","(oid,oid)","(umuser,oid)","(umserver,oid)","(umoptions,text[])"}
 \.
-
-
---
--- Name: entity_pkey; Type: CONSTRAINT; Schema: public; Owner: decibel
---
-
-ALTER TABLE ONLY catalog_relations
-    ADD CONSTRAINT entity_pkey PRIMARY KEY (version, entity_name);
-
-
---
--- Name: public; Type: ACL; Schema: -; Owner: decibel
---
-
-REVOKE ALL ON SCHEMA public FROM PUBLIC;
-REVOKE ALL ON SCHEMA public FROM decibel;
-GRANT ALL ON SCHEMA public TO decibel;
-GRANT ALL ON SCHEMA public TO PUBLIC;
-
-
---
--- PostgreSQL database dump complete
---
-
