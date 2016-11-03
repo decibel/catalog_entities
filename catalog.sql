@@ -1,3 +1,6 @@
+SET client_min_messages = WARNING;
+CREATE EXTENSION IF NOT EXISTS cat_tools;
+
 CREATE TYPE attribute AS (
 	attribute_name text,
 	attribute_type regtype
@@ -30,6 +33,10 @@ ALTER TABLE ONLY catalog_relations
 /*
  * VIEWS
  */
+
+\i views/current_version_relation.sql
+\i views/current_version_delta.sql -- Depends on current_version_relation
+
 CREATE VIEW changed AS
  SELECT a.version,
     a.entity_name,
