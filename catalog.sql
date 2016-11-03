@@ -73,4 +73,4 @@ CREATE VIEW expanded AS
    FROM catalog_relations e,
     LATERAL unnest(e.attributes) WITH ORDINALITY a(attribute_name, attribute_type, ordinality);
 
-\COPY catalog_relations (version, entity_name, entity_type, attributes) FROM 'data.tsv';
+\COPY catalog_relations (version, entity_name, entity_type, attributes) FROM 'data.tsv' (FORMAT csv, HEADER true)
