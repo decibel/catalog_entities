@@ -6,7 +6,9 @@ changes=`psql -qtc 'SELECT count(*) FROM current_version_delta' $@`
 ret=$?
 [ $ret -eq 0 ] || exit $ret
 
-if [ $changes -gt 0 ]; then
+if [ $changes -eq 0 ]; then
+    echo No changes
+else
     versions=`psql -qtc "SELECT min(version) || ',' || max(version) FROM current_version_relation" $@`
     ret=$?
     [ $ret -eq 0 ] || exit $ret
@@ -35,5 +37,5 @@ if [ $changes -gt 0 ]; then
         exit 1
     fi
 
-    git commit -m "Update version $version" $DATA
+    echo "git commit -m 'Update version $version' $DATA"
 fi
