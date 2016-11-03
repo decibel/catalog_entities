@@ -44,7 +44,7 @@ CREATE VIEW changed AS
   WHERE (a.attributes IS DISTINCT FROM a.previous_attributes);
 
 
-CREATE VIEW current AS
+CREATE VIEW latest AS
  SELECT catalog_relations.version,
     catalog_relations.entity_name,
     catalog_relations.entity_type,
@@ -54,13 +54,13 @@ CREATE VIEW current AS
            FROM catalog_relations catalog_relations_1));
 
 
-CREATE VIEW current_expanded AS
+CREATE VIEW latest_expanded AS
  SELECT c.version,
     c.entity_name,
     a.attribute_name,
     a.attribute_type,
     a.ordinality
-   FROM current c,
+   FROM latest c,
     LATERAL unnest(c.attributes) WITH ORDINALITY a(attribute_name, attribute_type, ordinality);
 
 
