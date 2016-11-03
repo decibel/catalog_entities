@@ -35,7 +35,9 @@ ALTER TABLE ONLY catalog_relations
  */
 
 \i views/current_version_relation.sql
-\i views/current_version_delta.sql -- Depends on current_version_relation
+
+-- Depends on current_version_relation
+\i views/current_version_delta.sql
 
 CREATE VIEW changed AS
  SELECT a.version,
