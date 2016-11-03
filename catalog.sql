@@ -3,6 +3,11 @@ CREATE TYPE attribute AS (
 	attribute_type regtype
 );
 
+CREATE TYPE entity_kind AS ENUM (
+  'Table'
+  , 'View'
+);
+
 CREATE TYPE entity_type AS ENUM (
     'Catalog',
     'Stats File',
@@ -10,11 +15,14 @@ CREATE TYPE entity_type AS ENUM (
 );
 
 CREATE TABLE catalog_relations (
-    version numeric NOT NULL,
-    entity_name text NOT NULL,
-    entity_type entity_type NOT NULL,
-    attributes attribute[] NOT NULL
+    version numeric NOT NULL
+    , entity_name text NOT NULL
+    , entity_kind entity_kind --NOT NULL
+    , attributes attribute[] NOT NULL
 );
+
+\COPY catalog_relations (version, entity_name, entity_kind, attributes) FROM 'data.tsv' (FORMAT csv, HEADER true)
+
 ALTER TABLE ONLY catalog_relations
     ADD CONSTRAINT entity_pkey PRIMARY KEY (version, entity_name);
 
@@ -25,12 +33,12 @@ ALTER TABLE ONLY catalog_relations
 CREATE VIEW changed AS
  SELECT a.version,
     a.entity_name,
-    a.entity_type,
+    a.entity_kind,
     a.attributes,
     a.previous_attributes
    FROM ( SELECT e.version,
             e.entity_name,
-            e.entity_type,
+            e.entity_kind,
             e.attributes,
             ( SELECT e2.attributes
                    FROM catalog_relations e2
@@ -47,7 +55,7 @@ CREATE VIEW changed AS
 CREATE VIEW latest AS
  SELECT catalog_relations.version,
     catalog_relations.entity_name,
-    catalog_relations.entity_type,
+    catalog_relations.entity_kind,
     catalog_relations.attributes
    FROM catalog_relations
   WHERE (catalog_relations.version = ( SELECT max(catalog_relations_1.version) AS max
@@ -73,4 +81,4 @@ CREATE VIEW expanded AS
    FROM catalog_relations e,
     LATERAL unnest(e.attributes) WITH ORDINALITY a(attribute_name, attribute_type, ordinality);
 
-\COPY catalog_relations (version, entity_name, entity_type, attributes) FROM 'data.tsv' (FORMAT csv, HEADER true)
+-- vi: expandtab sw=2 ts=2
