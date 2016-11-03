@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DATA=data.tsv
+DATA=data.csv
 
 changes=`psql -qtc 'SELECT count(*) FROM current_version_delta' $@`
 ret=$?

@@ -24,7 +24,7 @@ CREATE TABLE catalog_relations (
     , attributes attribute[] NOT NULL
 );
 
-\COPY catalog_relations (version, entity_name, entity_kind, attributes) FROM 'data.tsv' (FORMAT csv, HEADER true)
+\COPY catalog_relations (version, entity_name, entity_kind, attributes) FROM 'data.csv' (FORMAT csv, HEADER true)
 
 ALTER TABLE ONLY catalog_relations
     ADD CONSTRAINT entity_pkey PRIMARY KEY (version, entity_name);
