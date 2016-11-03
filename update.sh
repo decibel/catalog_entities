@@ -29,7 +29,6 @@ else
 
     psql -f update.sql $@ || exit 1
     ./dump.sh $@ || exit 1
-    git add $DATA || exit 1
 
     # Now there should be changes
     if git diff --quiet $DATA; then
@@ -37,5 +36,6 @@ else
         exit 1
     fi
 
+    git add $DATA || exit 1
     echo "git commit -m 'Update version $version' $DATA"
 fi
