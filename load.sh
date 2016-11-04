@@ -6,5 +6,8 @@ if [ "$1" == "-d" ]; then
 fi
 
 createdb $@ || exit $?
+
+cd `dirname $0` || exit $?
+
 psql -v ON_ERROR_STOP=1 -c 'CREATE EXTENSION IF NOT EXISTS cat_tools;' $@ || exit $?
 psql -v ON_ERROR_STOP=1 -f catalog.sql $@ || exit $?

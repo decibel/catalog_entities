@@ -9,6 +9,8 @@ ret=$?
 if [ $changes -eq 0 ]; then
     echo No changes
 else
+    cd `dirname $0`
+
     versions=`psql -qtc "SELECT min(version) || ',' || max(version) FROM current_version_relation" $@`
     ret=$?
     [ $ret -eq 0 ] || exit $ret
