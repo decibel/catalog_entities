@@ -1,5 +1,4 @@
-SET client_min_messages = WARNING;
-CREATE EXTENSION IF NOT EXISTS cat_tools;
+BEGIN;
 
 CREATE TYPE attribute AS (
 	attribute_name text,
@@ -90,4 +89,5 @@ CREATE VIEW expanded AS
    FROM catalog_relations e,
     LATERAL unnest(e.attributes) WITH ORDINALITY a(attribute_name, attribute_type, ordinality);
 
+COMMIT;
 -- vi: expandtab sw=2 ts=2
