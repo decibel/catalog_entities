@@ -2,7 +2,7 @@ BEGIN;
 
 CREATE TYPE attribute AS (
 	attribute_name text,
-	attribute_type regtype
+	attribute_type text
 );
 
 CREATE TYPE entity_kind AS ENUM (
