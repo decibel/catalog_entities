@@ -2,7 +2,7 @@
 
 DATA=data.csv
 
-changes=`psql -qtc 'SELECT count(*) FROM current_version_delta' $@`
+changes=`psql -X -qtc 'SELECT count(*) FROM current_version_delta' $@`
 ret=$?
 [ $ret -eq 0 ] || exit $ret
 
@@ -11,7 +11,7 @@ if [ $changes -eq 0 ]; then
 else
     cd `dirname $0`
 
-    versions=`psql -qtc "SELECT min(version) || ',' || max(version) FROM current_version_relation" $@`
+    versions=`psql -X -qtc "SELECT min(version) || ',' || max(version) FROM current_version_relation" $@`
     ret=$?
     [ $ret -eq 0 ] || exit $ret
     
@@ -29,7 +29,7 @@ else
         exit 1
     fi
 
-    psql -f update.sql $@ || exit 1
+    psql -X -f update.sql $@ || exit 1
     ./dump.sh $@ || exit 1
 
     # Now there should be changes
@@ -39,5 +39,5 @@ else
     fi
 
     git add $DATA || exit 1
-    echo "git commit -m 'Update version $version' $DATA"
+    git commit -m 'Update version $version' $DATA
 fi
