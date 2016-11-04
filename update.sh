@@ -39,5 +39,5 @@ else
     fi
 
     git add $DATA || exit 1
-    git commit -m 'Update version $version' $DATA
+    git commit -m "Update version $version" $DATA
 fi
