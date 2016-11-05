@@ -10,14 +10,11 @@ SELECT
       SELECT
           row(
             attname
-            , CASE
-              WHEN column_type IN ( 'name', 'anyarray' ) THEN 'text'
-              ELSE column_type
-            END
+            , column_type
           )::attribute
         FROM _cat_tools.column cc
         WHERE cc.reloid = c.reloid
-          AND ( attnum>0 OR attname IN( 'xmin', 'oid' ) )
+          AND ( attnum>0 OR attname = 'oid' )
           AND NOT attisdropped -- Be paranoid...
         ORDER BY attnum
       ) AS attributes
@@ -26,17 +23,6 @@ SELECT
   WHERE
     relname = 'pg_stat_statements'
     OR (relschema='pg_catalog' AND relkind IN ('r', 'v'))
-    /*
-        AND (
-            ( relkind = 'r' )--AND relname !~ '^pg_(authid|statistic)' )
-            OR ( relkind = 'v' AND (
-                  relname = 'pg_stat_user_functions' 
-                  OR ( relname ~ '^pg_stat' AND relname !~ '_(user|sys|xact)_' AND relname != 'pg_stats' )
-                  OR relname !~ '^pg_(group|indexes|matviews|policies|shadow|stat|tables|user|views)'
-            ) )
-        )
-      )
-      */
 ;
 
 -- vi: expandtab ts=2 sw=2
