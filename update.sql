@@ -1,6 +1,6 @@
 BEGIN;
 UPDATE catalog_relations r
-    SET entity_kind=d.entity_kind, attributes=d.attributes
+    SET entity_kind=d.entity_kind, attributes=d.attributes, system_attributes=d.system_attributes
     FROM current_version_delta d
     WHERE r.version=d.version AND r.entity_name=d.entity_name AND d.source~'current'
 ;

@@ -14,10 +14,23 @@ SELECT
           )::attribute
         FROM _cat_tools.column cc
         WHERE cc.reloid = c.reloid
-          AND ( attnum>0 OR attname = 'oid' )
+          AND attnum>0
           AND NOT attisdropped -- Be paranoid...
         ORDER BY attnum
       ) AS attributes
+
+    , array(
+      SELECT
+          row(
+            attname
+            , column_type
+          )::attribute
+        FROM _cat_tools.column cc
+        WHERE cc.reloid = c.reloid
+          AND attnum<= 0
+          AND NOT attisdropped -- Be paranoid...
+        ORDER BY attnum
+      ) AS system_attributes
 
   FROM _cat_tools.pg_class_v c
   WHERE

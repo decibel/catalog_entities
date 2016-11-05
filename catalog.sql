@@ -21,9 +21,10 @@ CREATE TABLE catalog_relations (
     , entity_name text NOT NULL
     , entity_kind entity_kind --NOT NULL
     , attributes attribute[] NOT NULL
+    , system_attributes attribute[]
 );
 
-\COPY catalog_relations (version, entity_name, entity_kind, attributes) FROM 'data.csv' (FORMAT csv, HEADER true)
+\COPY catalog_relations (version, entity_name, entity_kind, attributes, system_attributes) FROM 'data.csv' (FORMAT csv, HEADER true)
 
 ALTER TABLE ONLY catalog_relations
     ADD CONSTRAINT entity_pkey PRIMARY KEY (version, entity_name);
@@ -38,36 +39,12 @@ ALTER TABLE ONLY catalog_relations
 -- Depends on current_version_relation
 \i views/current_version_delta.sql
 
-CREATE VIEW changed AS
- SELECT a.version,
-    a.entity_name,
-    a.entity_kind,
-    a.attributes,
-    a.previous_attributes
-   FROM ( SELECT e.version,
-            e.entity_name,
-            e.entity_kind,
-            e.attributes,
-            ( SELECT e2.attributes
-                   FROM catalog_relations e2
-                  WHERE ((e2.entity_name = e.entity_name) AND (e2.version < e.version))
-                  ORDER BY e2.version DESC
-                 LIMIT 1) AS previous_attributes
-           FROM catalog_relations e
-          WHERE (e.version > ( SELECT min(catalog_relations.version) AS min
-                   FROM catalog_relations))
-          ORDER BY e.version, e.entity_name) a
-  WHERE (a.attributes IS DISTINCT FROM a.previous_attributes);
-
-
 CREATE VIEW latest AS
- SELECT catalog_relations.version,
-    catalog_relations.entity_name,
-    catalog_relations.entity_kind,
-    catalog_relations.attributes
-   FROM catalog_relations
-  WHERE (catalog_relations.version = ( SELECT max(catalog_relations_1.version) AS max
-           FROM catalog_relations catalog_relations_1));
+  SELECT *
+    FROM catalog_relations
+    WHERE version = (
+      SELECT max(version) FROM catalog_relations)
+;
 COMMIT;
 
 -- vi: expandtab sw=2 ts=2
