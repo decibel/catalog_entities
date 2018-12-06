@@ -1,6 +1,7 @@
 #!/bin/sh
 
-version=`psql -X -qtc "SELECT current_setting('server_version_num')"` || exit $?
+# Blindly assume postgres database exists...
+version=`psql -X -qtc "SELECT current_setting('server_version_num')" postgres` || exit $?
 
 if [ "$1" == "-d" ]; then
     shift
