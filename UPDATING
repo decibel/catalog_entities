@@ -1,0 +1,1 @@
+To update the information for a particular version, set your PATH and environment variables to point at the correct tools, then run ./refresh.sh <database name>.
